@@ -11,18 +11,22 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item mx-3">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" >Home</a>
         </li>
         <li class="nav-item mx-3">
-          <a class="nav-link" href="#">introduction</a>
+          <a class="nav-link btn" role="button" wire:click="$toggle('isIntroduction')">introduction</a>
         </li>
 
         <li class="nav-item mx-3">
-          <a class="nav-link" href="#">What to bring</a>
+          <a class="nav-link btn" role="button" wire:click="$toggle('isWhatToBring')">What to bring</a>
         </li>
 
         <li class="nav-item mx-3">
           <a class="nav-link disabled">allowance</a>
+        </li>
+
+        <li class="nav-item mx-3">
+          <a class="nav-link btn" role="button" wire:click="$toggle('isNewScheduleCard')">new Schedule</a>
         </li>
 
         <!-- li class="nav-item dropdown">
@@ -39,8 +43,8 @@
 
       </ul>
 
-      <button type="button" class="btn btn-success mx-1" wire:click="$toggle('isNewScheduleCard')">new</button>
-      <button type="button" class="btn btn-success mx-1" wire:click="$toggle('isEditScheduleCard')">edit</button>
+      <!-- <button type="button" class="btn btn-success mx-1" wire:click="$toggle('isNewScheduleCard')">new</button>
+      <button type="button" class="btn btn-success mx-1" wire:click="$toggle('isEditScheduleCard')">edit</button> -->
 
       <!-- form class="d-flex" role="search">
         <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -64,7 +68,7 @@
 <div class="container-fluid" style="margin-top: 4em;">　
 　
   <div class="row">
-    <h6>ーSCHEDULEー　{{ $date }}</h6>
+    <h6>ーSCHEDULEー</h6>
 
     <div class="col-sm-7">
 <!--  ***********************スケジュールの表示　view***************************************************** -->
@@ -209,15 +213,15 @@
                   </p>
       
                     @if (!empty($schedule->file1))　　{{-- file1が空じゃなければボタン表示 --}}
-                      <a class="btn btn-outline-primary btn-sm m-2" role="button" href="storage/{{ $schedule->file1 }}" target="_blank">添付ファイル１</a>
+                      <a class="btn btn-outline-success btn-sm m-1" role="button" href="storage/{{ $schedule->file1 }}" target="_blank">添付ファイル１</a>
                     @endif
       
                     @if (!empty($schedule->file2))　　{{-- file2が空じゃなければボタン表示 --}}
-                      <a class="btn btn-outline-primary btn-sm m-2" role="button" href="storage/{{ $schedule->file2 }}" target="_blank">添付ファイル２</a>
+                      <a class="btn btn-outline-success btn-sm m-1" role="button" href="storage/{{ $schedule->file2 }}" target="_blank">添付ファイル２</a>
                     @endif
 
                     @if (!empty($schedule->file3))　　{{-- file2が空じゃなければボタン表示 --}}
-                      <a class="btn btn-outline-primary btn-sm m-2" role="button" href="storage/{{ $schedule->file3 }}" target="_blank">添付ファイル３</a>
+                      <a class="btn btn-outline-success btn-sm m-1" role="button" href="storage/{{ $schedule->file3 }}" target="_blank">添付ファイル３</a>
                     @endif
                   </p>
                 </div>
@@ -256,7 +260,7 @@
       <p class="card-text">Please enter the required information.</p>
   
   
-          <form wire:submit.prevent="save">
+          <form wire:submit.prevent="newSave" id="newSchedule">
             <div class="mb-3">
               <label for="caption" class="form-label">caption</label>
               <input type="text" class="form-control" name="caption" id="caption" wire:model.defer="caption">
@@ -270,7 +274,7 @@
             <div class="row mb-3">
               <div class="col">
                 <label for="date" class="form-label">date</label>
-                <input type="date" class="form-control" name="date" id="date" wire:model.defer="date">
+                <input type="date" class="form-control" name="date" id="date" wire:model.lazy="date">
               </div>
               <div class="col">
                 <label for="time" class="form-label">time</label>
@@ -291,7 +295,7 @@
             </div>
   
             <div class="mb-3">
-              <button type="submit">Save</button>
+              <button type="submit" class="btn btn-outline-success">Save</button>
             </div>
   
           </form>
@@ -328,8 +332,7 @@
           <h5 class="card-title">edit time schedule</h5>
           <p class="card-text">Please enter the required information.</p>
 
-
-              <form wire:submit.prevent="save">
+              <form wire:submit.prevent="editSave" id="editSchedule">
                 <div class="mb-3">
                   <label for="caption" class="form-label">caption</label>
                   <input type="text" class="form-control" name="caption" id="caption" wire:model.defer="caption">
@@ -343,7 +346,7 @@
                 <div class="row mb-3">
                   <div class="col">
                     <label for="date" class="form-label">date</label>
-                    <input type="date" class="form-control" name="date" id="date" wire:model.defer="date">
+                    <input type="date" class="form-control" name="date" id="date" wire:model.lazy="date">
                   </div>
                   <div class="col">
                     <label for="time" class="form-label">time</label>
@@ -352,128 +355,71 @@
                 </div>
 
 
+                
+                @if(isset($image1) || isset($image2) || isset($image3))
+                  <div class="mb-3">
+                     <div class="col"><label for="images" class="form-label">images</label></div>
+                      <div class="col">
+                        @isset($image1)
+                          <a href="/storage/{{$image1}}" target="_blank"><img src="/storage/{{$image1}}" style="width: auto;height: 2em;" alt=""></a>
+                        @endisset
+                        @isset($image2)
+                          <a href="/storage/{{$image2}}" target="_blank"><img src="/storage/{{$image2}}" style="width: auto;height: 2em;" alt=""></a>
+                        @endisset
+                        @isset($image3)
+                          <a href="/storage/{{$image3}}" target="_blank"><img src="/storage/{{$image3}}" style="width: auto;height: 2em;" alt=""></a>
+                        @endisset
+                        <button type="button" class="btn btn-outline-secondary btn-sm" wire:click="imageDelete()">delete</button>
+                      </div>
+                  </div> 
+                @else
+                  <div class="mb-3">
+                    <label for="images" class="form-label">images (Up to 3 possible)</label>
+                    <input type="file" wire:model="images" accept=".jpg, .jpeg, .png, .gif" class="form-control" multiple>
+                    @error('images.*') <div class="alert alert-danger">{{ $message }}</div> @enderror
+                  </div>
+                @endif
 
-
-<div class="row">　<!-- 画像１～３　-->
-  <div class="col">
-    @if(isset( $image1 ))
-    <div class="mb-3">
-      <label for="image1" class="form-label">image1</label>
-      <a href="/storage/{{$image1}}" target="_blank"><img src="/storage/{{$image1}}" style="width: auto;height: 1em;" alt=""></a>
-      <button type="button" class="btn btn-outline-secondary btn-sm iza" onclick="delButtonClick(this)">del</button>
-      <input type="file" wire:model.defer="image1" value="{{$image1}}" accept=".jpg, .jpeg, .png, .gif" class="form-control form-control-sm" style="display:none;">
-      <input type="hidden" name="image1del" value="false">
-    </div> 
-    @else
-      <div class="mb-3">
-      <label for="image1" class="form-label">image1</label>
-      <input type="file" wire:model.defer="image1" value="{{$image1}}" accept=".jpg, .jpeg, .png, .gif" class="form-control form-control-sm">
-      </div>
-    @endif 
-  </div>
-
-  <div class="col">
-    @if(isset( $image2 ))
-    <div class="mb-3">
-      <label for="image2" class="form-label">image2</label>
-      <a href="/storage/{{$image2}}" target="_blank"><img src="/storage/{{$image2}}" style="width: auto;height: 1em;" alt=""></a>
-      <button type="button" class="btn btn-outline-secondary btn-sm iza" onclick="delButtonClick(this)">del</button>
-      <input type="file" wire:model.defer="image2" value="{{$image2}}" accept=".jpg, .jpeg, .png, .gif" class="form-control form-control-sm" style="display:none;">
-      <input type="hidden" name="image2del" value="false">
-    </div> 
-    @else
-      <div class="mb-3">
-      <label for="image2" class="form-label">image2</label>
-      <input type="file" wire:model.defer="image2" value="{{$image2}}" accept=".jpg, .jpeg, .png, .gif" class="form-control form-control-sm">
-      </div>
-    @endif 
-  </div>
-
-  <div class="col">
-    @if(isset( $image3 ))
-    <div class="mb-3">
-      <label for="image3" class="form-label">image3</label>
-      <a href="/storage/{{$image3}}" target="_blank"><img src="/storage/{{$image3}}" style="width: auto;height: 1em;" alt=""></a>
-      <button type="button" class="btn btn-outline-secondary btn-sm iza" onclick="delButtonClick(this)">del</button>
-      <input type="file" wire:model.defer="image3" value="{{$image3}}" accept=".jpg, .jpeg, .png, .gif" class="form-control form-control-sm" style="display:none;">
-      <input type="hidden" name="image3del" value="false">
-    </div> 
-    @else
-      <div class="mb-3">
-      <label for="image3" class="form-label">image3</label>
-      <input type="file" wire:model.defer="image3" value="{{$image3}}" accept=".jpg, .jpeg, .png, .gif" class="form-control form-control-sm">
-      </div>
-    @endif 
-  </div>
-</div>　<!-- div class="row" ここまで画像１～３　-->
+                
+                
+                @if(isset($file1) || isset($file2) || isset($file3))
+                  <div class="mb-3">
+                     <div class="col"><label for="images" class="form-label">files</label></div>
+                      <div class="col">
+                        @isset($file1)
+                          <a href="/storage/{{$file1}}" target="_blank">file1</a>
+                        @endisset
+                        @isset($file2)
+                          <a href="/storage/{{$file2}}" target="_blank">file2</a>
+                        @endisset
+                        @isset($file3)
+                          <a href="/storage/{{$file3}}" target="_blank">file3</a>
+                        @endisset
+                        <button type="button" class="btn btn-outline-secondary btn-sm" wire:click="fileDelete()">delete</button>
+                      </div>
+                  </div> 
+                @else
+                  <div class="mb-3">
+                  <label for="images" class="form-label">files (Up to 3 possible)</label>
+                      <input type="file" wire:model="files" accept=".pdf, .xlsx, .docx" class="form-control" multiple>
+                      @error('files.*') <div class="alert alert-danger">{{ $message }}</div> @enderror
+                  </div>
+                @endif
 
 
 
-
-<div class="row">　<!-- 添付ファイル１～３　-->
-  <div class="col">
-    @if(isset( $file1 ))
-    <div class="mb-3">
-      <label for="file1" class="form-label mr-2">file2</label>
-      <a href="/storage/{{$file1}}" target="_blank">link</a>
-      <button type="button" class="btn btn-outline-secondary btn-sm iza" onclick="delButtonClick(this)">del</button>
-      <input type="file" wire:model.defer="file1" value="{{$file1}}" accept=".pdf, .xlsx, .docx" class="form-control form-control-sm" style="display:none;">
-      <input type="hidden" name="file1del" value="false">
-    </div> 
-    @else
-      <div class="mb-3">
-      <label for="file1" class="form-label mr-2">file1</label>
-      <input type="file" wire:model.defer="file1" value="{{$file1}}" accept=".pdf, .xlsx, .docx" class="form-control form-control-sm">
-      </div>
-    @endif 
-  </div>
-
-  <div class="col">
-    @if(isset( $file2 ))
-    <div class="mb-3">
-      <label for="file2" class="form-label mr-2">file2</label>
-      <a href="/storage/{{$file2}}" target="_blank">link</a>
-      <button type="button" class="btn btn-outline-secondary btn-sm iza" onclick="delButtonClick(this)">del</button>
-      <input type="file" wire:model.defer="file2" value="{{$file2}}" accept=".pdf, .xlsx, .docx" class="form-control form-control-sm" style="display:none;">
-      <input type="hidden" name="file2del" value="false">
-    </div> 
-    @else
-      <div class="mb-3">
-      <label for="file2" class="form-label mr-2">file2</label>
-      <input type="file" wire:model.defer="file2" value="{{$file2}}" accept=".pdf, .xlsx, .docx" class="form-control form-control-sm">
-      </div>
-    @endif 
-  </div>
-
-  <div class="col">
-    @if(isset( $file3 ))
-    <div class="mb-3">
-      <label for="file3" class="form-label mr-2">file3</label>
-      <a href="/storage/{{$file3}}" target="_blank">link</a>
-      <button type="button" class="btn btn-outline-secondary btn-sm iza" onclick="delButtonClick(this)">del</button>
-      <input type="file" wire:model.defer="file3" value="{{$file3}}" accept=".pdf, .xlsx, .docx" class="form-control form-control-sm" style="display:none;">
-      <input type="hidden" name="file3del" value="false">
-    </div> 
-    @else
-      <div class="mb-3">
-      <label for="file3" class="form-label mr-2">file3</label>
-      <input type="file" wire:model.defer="file3" value="{{$file3}}" accept=".pdf, .xlsx, .docx" class="form-control form-control-sm">
-      </div>
-    @endif 
-  </div>
-
-
-</div><!-- div class="row" ここまで添付ファイル１～３　-->
+                
 
 
 
 
 
 
-
-                <div class="mb-3">
-                  <button type="submit">Save</button>
+                <div class="mb-3 row">
+                  <div class="col-sm-11"><button class="btn btn-primary" type="submit">Save schedule</button></div>
+                  <div class="col-sm-1"><a class="btn btn-sm btn-outline-danger" role="button" wire:click="deleteSchedule({{ $schedule_id }})"><i class="fa-solid fa-trash-can"></i></a></div>
                 </div>
+
 
               </form>
 
@@ -500,6 +446,66 @@
 
 
 
+
+
+
+
+
+
+
+<!--  *****************what to bring カード************************************************ -->
+
+@if ($isWhatToBring)
+  <div class="card mt-1 schedule_card" style="position: sticky;top: 60px;" id="new_schedule_card">
+    <h5 class="card-header">What to Bring</h5>
+    <div class="card-body">
+      <h5 class="card-title">What to Bring</h5>
+      <p class="card-text">Please read information.</p>
+            <div class="mb-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="CheckList01">
+                <label class="form-check-label" for="CheckList01">Bring list 01</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="CheckList02">
+                <label class="form-check-label" for="CheckList02">Bring list 02</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="CheckList03">
+                <label class="form-check-label" for="CheckList03">Bring list 03</label>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="CheckList04">
+                <label class="form-check-label" for="CheckList03">Bring list 04</label>
+              </div>
+            </div>
+
+    </div>
+  </div>
+@endif
+
+
+
+
+
+<!-- *******************what to bring カード end********************* -->
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+
+
+
+
     </div>
   </div>
 </div>　　<!--   div class="container-fluid"  ココマデ*********************************  -->
@@ -511,33 +517,46 @@
 
 
 <script>
-  //edit schedule の際、該当日付のアコーディオンを開く
-  window.addEventListener('show_card', event => {
+  //該当日付のアコーディオンを開く
+  window.addEventListener('show_accordion', event => {
       //if(confirm('編集します。よろしいですか？')) {
           //console.log(event.detail.currentDate);
-          var elm = document.getElementById(event.detail.currentDate); 
-          elm.classList.toggle("show");
+          let elm = document.getElementById(event.detail.currentDate); 
+          if (elm === null){
+            // 要素が存在しない場合の処理
+          } else {
+            // 要素が存在する場合の処理
+            elm.classList.toggle("show");
+          }
+
+
+          
       //}
+  });
+
+  window.addEventListener('reset_new_shedule', event => {
+          let form = document.getElementById("newSchedule");
+          let currentDate = event.detail.currentDate;
+          let currentTime = event.detail.currentTime;
+          form.reset();
+          @this.set('date' , currentDate);    //Timetable.phpの $dateプロパティ に '2023-12-13'　日付文字列をセット
+          @this.set('time' , currentTime);    //Timetable.phpの $dateプロパティ に '2023-12-13'　日付文字列をセット
+  });
+
+  window.addEventListener('reset_edit_shedule', event => {
+          let form = document.getElementById("editSchedule");
+          form.reset();
   })
-
-//該当日付のアコーディオンを開く処理
-function openAccordion(date){
-  var elm = document.getElementById(date); 
-  elm.classList.toggle("show");
-}
-
-  //****************************Livewire のイベントリスナで処理できそう。そうしないと、画像をあっぷしただけで、アコーディオンが閉じちゃう・・・
+  
 
   //Editボタンを押した際、画像ファイルor添付ファイルがある場合の、Delボタンの処理
   function delButtonClick(button){
-    button.setAttribute('style', 'display: none;');    //ボタンを非表示
-    let next = button.nextElementSibling;
-    next.setAttribute('style', 'display: inline;');    //<input type="file" ******  accept=".jpg, .png">の非表示を解除
-    let next2 = next.nextElementSibling;
-    next2.setAttribute('value', 'true');  
-    let prev = button.previousElementSibling;
-    prev.setAttribute('style', 'display: none;');    //<a href***><img src****></a> を非表示
-    //Livewire.emit('accordion');
+    let propName = button.getAttribute('name');
+    if(propName == 'image'){
+      @this.imageDelete();
+    }else if(propName == 'file'){
+      @this.fileDelete();
+    }
   }
 </script>
 
