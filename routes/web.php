@@ -18,8 +18,10 @@ use Illuminate\Support\Facades\Route;
 //   return view('trip');
 // });
 
-Route::get('/', 'App\Http\Controllers\ScheduleController@trip')->name('schedule.route');
-
+// Route::get('/', 'App\Http\Controllers\ScheduleController@trip')->name('schedule.route');
+Route::get('/', function () { 
+  return view('welcome');
+});
 
 // Route::get('/showAll', 'ScheduleController@all');
 // Laravelのバージョン7までだったら、この書き方はOKでした。しかし、バージョン8になってこの書き方はNGになりました。
